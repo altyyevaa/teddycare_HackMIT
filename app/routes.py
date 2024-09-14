@@ -29,6 +29,7 @@ def login_form(user_type):
         if user and user.check_password(password):
             if (user_type == 'patient' and not user.is_doctor) or (user_type == 'doctor' and user.is_doctor):
                 login_user(user)
+                flash('Logged in successfully.', 'success')
                 return redirect(url_for('main.patient_dashboard' if user_type == 'patient' else 'main.doctor_dashboard'))
             else:
                 flash('Invalid user type for this account', 'error')
@@ -63,9 +64,9 @@ def signup(user_type):
         new_user = User(
             username=username,
             email=email,
-            password=generate_password_hash(password, method='sha256'),
             is_doctor=(user_type == 'doctor')
         )
+        new_user.set_password(password)
 
         try:
             db.session.add(new_user)

@@ -1,4 +1,5 @@
 from app import create_app, db
+from app.models import User, Patient, Doctor
 
 app = create_app()
 
