@@ -4,6 +4,7 @@ from .models import User, Patient, Doctor
 from . import db
 from .terra_integration import get_user_trends
 from .llm_chat import get_llm_response
+from werkzeug.security import generate_password_hash
 
 main = Blueprint('main', __name__)
 
@@ -11,20 +12,82 @@ main = Blueprint('main', __name__)
 def index():
     return redirect(url_for('main.login'))
 
-@main.route('/login', methods=['GET', 'POST'])
+@main.route('/login')
 def login():
+    return render_template('login.html')
+
+@main.route('/login/<user_type>', methods=['GET', 'POST'])
+def login_form(user_type):
+    if user_type not in ['patient', 'doctor']:
+        return redirect(url_for('main.login'))
+
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
         user = User.query.filter_by(username=username).first()
+        
         if user and user.check_password(password):
-            login_user(user)
-            if user.is_doctor:
-                return redirect(url_for('main.doctor_dashboard'))
+            if (user_type == 'patient' and not user.is_doctor) or (user_type == 'doctor' and user.is_doctor):
+                login_user(user)
+                return redirect(url_for('main.patient_dashboard' if user_type == 'patient' else 'main.doctor_dashboard'))
             else:
-                return redirect(url_for('main.patient_dashboard'))
-        flash('Invalid username or password')
-    return render_template('login.html')
+                flash('Invalid user type for this account', 'error')
+        else:
+            flash('Invalid username or password', 'error')
+
+    return render_template('login_form.html', user_type=user_type)
+
+@main.route('/signup/<user_type>', methods=['GET', 'POST'])
+def signup(user_type):
+    if user_type not in ['patient', 'doctor']:
+        return redirect(url_for('main.login'))
+
+    if request.method == 'POST':
+        username = request.form.get('username')
+        email = request.form.get('email')
+        password = request.form.get('password')
+        confirm_password = request.form.get('confirm_password')
+
+        # Check if username or email already exists
+        user = User.query.filter((User.username == username) | (User.email == email)).first()
+        if user:
+            flash('Username or email already exists', 'error')
+            return render_template('signup.html', user_type=user_type)
+
+        # Check if passwords match
+        if password != confirm_password:
+            flash('Passwords do not match', 'error')
+            return render_template('signup.html', user_type=user_type)
+
+        # Create new user
+        new_user = User(
+            username=username,
+            email=email,
+            password=generate_password_hash(password, method='sha256'),
+            is_doctor=(user_type == 'doctor')
+        )
+
+        try:
+            db.session.add(new_user)
+            db.session.commit()
+
+            # Create associated Patient or Doctor object
+            if user_type == 'patient':
+                new_patient = Patient(user_id=new_user.id)
+                db.session.add(new_patient)
+            else:
+                new_doctor = Doctor(user_id=new_user.id)
+                db.session.add(new_doctor)
+            db.session.commit()
+
+            flash('Account created successfully. Please log in.', 'success')
+            return redirect(url_for('main.login_form', user_type=user_type))
+        except Exception as e:
+            db.session.rollback()
+            flash('An error occurred. Please try again.', 'error')
+            print(f"Error during signup: {str(e)}")  # Log the error for debugging
+
+    return render_template('signup.html', user_type=user_type)
 
 @main.route('/logout')
 @login_required
@@ -68,3 +131,15 @@ def patient_chat():
         response = get_llm_response(user_input)
         return render_template('patient/chat.html', response=response)
     return render_template('patient/chat.html')
+
+@main.route('/patient_login', methods=['GET', 'POST'])
+def patient_login():
+    # Implement patient login logic here
+    flash('Patient login not yet implemented', 'info')
+    return redirect(url_for('main.login'))
+
+@main.route('/doctor_login', methods=['GET', 'POST'])
+def doctor_login():
+    # Implement doctor login logic here
+    flash('Doctor login not yet implemented', 'info')
+    return redirect(url_for('main.login'))
