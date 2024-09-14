@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Patient Information</h1>
+<h2>{{ patient.user.username }}</h2>
+<h3>Trends</h3>
+<ul>
+    <li>Sleep: {{ trends.sleep[-1] }} hours</li>
+    <li>Stress: {{ trends.stress[-1] }} / 10</li>
+    <li>Exercise: {{ trends.exercise[-1] }} minutes</li>
+</ul>
+<!-- Add more patient information and EHR details here -->
+{% endblock %}

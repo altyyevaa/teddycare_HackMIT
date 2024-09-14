@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Patient Dashboard</h1>
+<h2>Your Health Trends</h2>
+<ul>
+    <li>Sleep: {{ trends.sleep[-1] }} hours</li>
+    <li>Stress: {{ trends.stress[-1] }} / 10</li>
+    <li>Exercise: {{ trends.exercise[-1] }} minutes</li>
+</ul>
+<a href="{{ url_for('main.patient_chat') }}">Chat with Nurse Teddy</a>
+{% endblock %}

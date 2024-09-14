@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Chat with Nurse Teddy</h1>
+<div id="chat-history">
+    {% if response %}
+        <p><strong>Nurse Teddy:</strong> {{ response }}</p>
+    {% endif %}
+</div>
+<form method="POST">
+    <input type="text" name="user_input" placeholder="Type your message..." required>
+    <button type="submit">Send</button>
+</form>
+{% endblock %}
