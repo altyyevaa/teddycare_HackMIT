@@ -8,7 +8,26 @@
     <li>Stress: {{ trends.stress[-1] }} / 10</li>
     <li>Exercise: {{ trends.exercise[-1] }} minutes</li>
 </ul>
+<button id="openWidgetBtn">Connect Health Device</button>
 <a href="{{ url_for('main.patient_chat') }}">Chat with Nurse Teddy</a>
 <a href="{{ url_for('main.patient_doctor_info') }}">View Doctor Information</a>
 <a href="{{ url_for('main.patient_edit_profile') }}">Edit Profile</a>
+
+<script>
+document.getElementById('openWidgetBtn').addEventListener('click', function() {
+    fetch('{{ url_for("main.generate_widget_url") }}')
+        .then(response => response.json())
+        .then(data => {
+            if (data.widget_url) {
+                window.open(data.widget_url, '_blank');
+            } else {
+                alert('Failed to generate widget URL');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while generating the widget URL');
+        });
+});
+</script>
 {% endblock %}

@@ -1,0 +1,10 @@
+Flask==2.3.2
+Flask-SQLAlchemy==3.0.3
+Flask-Login==0.6.2
+Flask-Migrate==4.0.4
+SQLAlchemy==2.0.15
+Werkzeug==2.3.4
+openai==0.27.7
+python-dotenv==1.0.0
+requests==2.31.0
+terra-python==1.4.1

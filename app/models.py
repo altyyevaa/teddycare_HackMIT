@@ -1,6 +1,7 @@
 from . import db, login_manager
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
+from datetime import datetime
 
 
 class User(UserMixin, db.Model):
@@ -61,10 +62,10 @@ class Doctor(db.Model):
 
 class TerraWebhookData(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    patient_id = db.Column(db.Integer, db.ForeignKey("patient.id"), nullable=False)
+    patient_id = db.Column(db.String(100), nullable=False)  # Changed to String to match Terra user_id
     webhook_type = db.Column(db.String(50), nullable=False)
-    timestamp = db.Column(db.DateTime, nullable=False)
-    data = db.Column(db.JSON, nullable=False)
+    timestamp = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    data = db.Column(db.Text, nullable=False)  # Store JSON as text
 
 
 class Sleep(db.Model):
