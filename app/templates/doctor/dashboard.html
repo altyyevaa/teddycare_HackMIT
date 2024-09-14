@@ -8,4 +8,5 @@
     <li><a href="{{ url_for('main.patient_info', patient_id=patient.id) }}">{{ patient.user.username }}</a></li>
     {% endfor %}
 </ul>
+<a href="{{ url_for('main.doctor_edit_profile') }}" class="btn">Edit Profile</a>
 {% endblock %}

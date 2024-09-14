@@ -127,11 +127,16 @@ def patient_dashboard():
 def patient_chat():
     if current_user.is_doctor:
         return redirect(url_for('main.doctor_dashboard'))
+    
+    chat_history = []
     if request.method == 'POST':
         user_input = request.form.get('user_input')
         response = get_llm_response(user_input)
-        return render_template('patient/chat.html', response=response)
-    return render_template('patient/chat.html')
+        chat_history = request.form.get('chat_history', '[]')
+        chat_history = eval(chat_history)  # Convert string to list
+        chat_history.append({"user": user_input, "bot": response})
+    
+    return render_template('patient/chat.html', chat_history=chat_history)
 
 @main.route('/patient_login', methods=['GET', 'POST'])
 def patient_login():
@@ -144,3 +149,50 @@ def doctor_login():
     # Implement doctor login logic here
     flash('Doctor login not yet implemented', 'info')
     return redirect(url_for('main.login'))
+
+@main.route('/patient/doctor_info')
+@login_required
+def patient_doctor_info():
+    if current_user.is_doctor:
+        return redirect(url_for('main.doctor_dashboard'))
+    patient = Patient.query.filter_by(user_id=current_user.id).first()
+    return render_template('patient/doctor_info.html', doctor=patient.doctor)
+
+@main.route('/doctor/edit_profile', methods=['GET', 'POST'])
+@login_required
+def doctor_edit_profile():
+    if not current_user.is_doctor:
+        return redirect(url_for('main.patient_dashboard'))
+    doctor = Doctor.query.filter_by(user_id=current_user.id).first()
+    if request.method == 'POST':
+        doctor.specialization = request.form.get('specialization')
+        doctor.bio = request.form.get('bio')
+        doctor.office_address = request.form.get('office_address')
+        doctor.phone_number = request.form.get('phone_number')
+        doctor.license_number = request.form.get('license_number')
+        doctor.education = request.form.get('education')
+        doctor.years_of_experience = request.form.get('years_of_experience')
+        db.session.commit()
+        flash('Profile updated successfully', 'success')
+        return redirect(url_for('main.doctor_dashboard'))
+    return render_template('doctor/edit_profile.html', doctor=doctor)
+
+@main.route('/patient/edit_profile', methods=['GET', 'POST'])
+@login_required
+def patient_edit_profile():
+    if current_user.is_doctor:
+        return redirect(url_for('main.doctor_dashboard'))
+    patient = Patient.query.filter_by(user_id=current_user.id).first()
+    if request.method == 'POST':
+        current_user.username = request.form.get('username')
+        current_user.email = request.form.get('email')
+        current_user.age = request.form.get('age')
+        current_user.location = request.form.get('location')
+        if request.form.get('password'):
+            current_user.set_password(request.form.get('password'))
+        patient.insurance_provider = request.form.get('insurance_provider')
+        patient.insurance_policy_number = request.form.get('insurance_policy_number')
+        db.session.commit()
+        flash('Profile updated successfully', 'success')
+        return redirect(url_for('main.patient_dashboard'))
+    return render_template('patient/edit_profile.html', patient=patient)

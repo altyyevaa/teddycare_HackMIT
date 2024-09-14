@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Edit Your Profile</h1>
+<form method="POST">
+    <label for="username">Username:</label>
+    <input type="text" id="username" name="username" value="{{ current_user.username }}" required>
+
+    <label for="email">Email:</label>
+    <input type="email" id="email" name="email" value="{{ current_user.email }}" required>
+
+    <label for="password">New Password (leave blank to keep current):</label>
+    <input type="password" id="password" name="password">
+
+    <label for="age">Age:</label>
+    <input type="number" id="age" name="age" value="{{ current_user.age }}">
+
+    <label for="location">Location:</label>
+    <input type="text" id="location" name="location" value="{{ current_user.location }}">
+
+    <label for="insurance_provider">Insurance Provider:</label>
+    <input type="text" id="insurance_provider" name="insurance_provider" value="{{ patient.insurance_provider }}">
+
+    <label for="insurance_policy_number">Insurance Policy Number:</label>
+    <input type="text" id="insurance_policy_number" name="insurance_policy_number" value="{{ patient.insurance_policy_number }}">
+
+    <button type="submit">Update Profile</button>
+</form>
+<a href="{{ url_for('main.patient_dashboard') }}" class="btn">Back to Dashboard</a>
+{% endblock %}

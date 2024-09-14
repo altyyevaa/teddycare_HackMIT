@@ -2,12 +2,18 @@
 
 {% block content %}
 <h1>Patient Information</h1>
-<h2>{{ patient.user.username }}</h2>
-<h3>Trends</h3>
+<p><strong>Name:</strong> {{ patient.user.username }}</p>
+<p><strong>Age:</strong> {{ patient.user.age }}</p>
+<p><strong>Location:</strong> {{ patient.user.location }}</p>
+<p><strong>Insurance Provider:</strong> {{ patient.insurance_provider }}</p>
+<p><strong>Insurance Policy Number:</strong> {{ patient.insurance_policy_number }}</p>
+
+<h2>Health Trends</h2>
 <ul>
     <li>Sleep: {{ trends.sleep[-1] }} hours</li>
     <li>Stress: {{ trends.stress[-1] }} / 10</li>
     <li>Exercise: {{ trends.exercise[-1] }} minutes</li>
 </ul>
-<!-- Add more patient information and EHR details here -->
+
+<a href="{{ url_for('main.doctor_dashboard') }}" class="btn">Back to Dashboard</a>
 {% endblock %}

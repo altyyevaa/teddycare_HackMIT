@@ -9,6 +9,8 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(100), unique=True, nullable=False)
     password = db.Column(db.String(200), nullable=False)
     is_doctor = db.Column(db.Boolean, default=False)
+    age = db.Column(db.Integer)
+    location = db.Column(db.String(200))
 
     def set_password(self, password):
         self.password = generate_password_hash(password)
@@ -24,17 +26,32 @@ def load_user(user_id):
 
 class Patient(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), unique=True, nullable=False)
-    user = db.relationship('User', backref=db.backref('patient', uselist=False))
-    terra_user_id = db.Column(db.String(100), unique=True)  # Add this if you're using Terra
+    user_id = db.Column(
+        db.Integer, db.ForeignKey("user.id"), unique=True, nullable=False
+    )
+    user = db.relationship("User", backref=db.backref("patient", uselist=False))
+    terra_user_id = db.Column(db.String(100), unique=True)
+    doctor_id = db.Column(db.Integer, db.ForeignKey("doctor.id"))
+    insurance_provider = db.Column(db.String(100))
+    insurance_policy_number = db.Column(db.String(100))
 
     # Add other patient-specific fields
 
 
 class Doctor(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), unique=True, nullable=False)
-    user = db.relationship('User', backref=db.backref('doctor', uselist=False))
+    user_id = db.Column(
+        db.Integer, db.ForeignKey("user.id"), unique=True, nullable=False
+    )
+    user = db.relationship("User", backref=db.backref("doctor", uselist=False))
+    specialization = db.Column(db.String(100))
+    bio = db.Column(db.Text)
+    office_address = db.Column(db.String(200))
+    phone_number = db.Column(db.String(20))
+    patients = db.relationship("Patient", backref="doctor", lazy="dynamic")
+    license_number = db.Column(db.String(100))
+    education = db.Column(db.Text)
+    years_of_experience = db.Column(db.Integer)
 
     # Add other doctor-specific fields
 

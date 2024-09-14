@@ -25,11 +25,25 @@ input, button {
 }
 
 #chat-history {
+    height: 300px;
+    overflow-y: auto;
     border: 1px solid #ccc;
     padding: 10px;
-    height: 300px;
-    overflow-y: scroll;
     margin-bottom: 10px;
+}
+
+#chat-history p {
+    margin: 5px 0;
+}
+
+form input[type="text"] {
+    width: 80%;
+    padding: 5px;
+}
+
+form button {
+    width: 18%;
+    padding: 5px;
 }
 
 .container {
